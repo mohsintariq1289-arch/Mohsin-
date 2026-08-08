@@ -1,0 +1,342 @@
+l<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Journey of One Beautiful Year | Mohsin & Muzammil</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Top Floating Controls -->
+    <div class="top-widget">
+        <div class="clock-display" id="clock">07 Aug 2026 | 00:00:00 pm</div>
+        <button class="music-btn" onclick="toggleMusic()" id="music-toggle-btn">🎵 Play Music</button>
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="bg-music" loop src="music.mp3"></audio>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="loader-ring"></div>
+        <p class="typewriter-text" id="preloader-text">Preparing Something Special...</p>
+        <div class="preloader-subtext">Every Second You Wait... Brings You Closer To A Beautiful Surprise.</div>
+    </div>
+
+    <div id="app-container">
+
+        <!-- SCENE 1: CINEMATIC OPENING -->
+        <div class="scene active" id="scene-1">
+            <canvas id="canvas-scene-1"></canvas>
+            <div class="quote-container" id="quote-box">
+                <p class="cinematic-quote hidden" id="quote-1">"Some people come into our lives for a reason...<br>but a few become the reason behind our most beautiful memories."</p>
+                <p class="cinematic-quote hidden" id="quote-2">"This isn't just a surprise...<br>it's a journey through one unforgettable year of friendship."</p>
+            </div>
+        </div>
+
+        <!-- SCENE 2: PREMIUM 3D FLOWER BOUQUET (EASTER EGG 1 TRIGGER) -->
+        <div class="scene" id="scene-2">
+            <div class="glass-card text-center bouquet-card" onclick="nextScene()">
+                <div class="bouquet-3d">💐</div>
+                <h3 class="gold-subtitle">Especially Crafted For</h3>
+                <!-- Trigger 1: Clicking Name -->
+                <h1 class="main-title-gold" id="secret-easter-trigger" onclick="event.stopPropagation(); triggerEasterEggPopup();">Muzammil Tanoli ❤️</h1>
+                <p class="sub-text">With Love, Respect & Endless Memories</p>
+                <div class="tap-hint">Tap anywhere to continue ✨</div>
+            </div>
+        </div>
+
+        <!-- SCENE 3: MAGICAL BALLOON POPPING -->
+        <div class="scene" id="scene-3">
+            <div id="balloon-container"></div>
+            <div class="glass-card overlay-card text-center">
+                <h2>🎈 Pop The Floating Balloons!</h2>
+                <p class="hint">Tap on the balloons to reveal hidden brotherhood values!</p>
+                <div class="revealed-words-container" id="revealed-words-list"></div>
+                <p class="balloon-counter">Words Unlocked: <span id="pop-count">0</span>/10</p>
+                <button id="balloon-next-btn" class="btn-glow mt-15 hidden" onclick="nextScene()">Form The Heart ❤️</button>
+            </div>
+        </div>
+
+        <!-- SCENE 4: HEART FORMATION (EASTER EGG 2 TRIGGER) -->
+        <div class="scene" id="scene-4">
+            <canvas id="heart-canvas"></canvas>
+            <div class="glass-card overlay-card text-center" id="heart-card">
+                <!-- Trigger 2: Clicking Interactive Heart -->
+                <div class="glowing-heart-interactive" onclick="triggerEasterEggPopup()">❤️</div>
+                <h1 class="heart-names">M ❤️ M</h1>
+                <h3 class="gold-subtitle">Mohsin × Muzammil</h3>
+                <p class="sub-text">One Heart. One Bond. Countless Memories.</p>
+                <div class="tap-hint" onclick="explodeHeart()">Tap Heart To Explode Golden Light ✨</div>
+            </div>
+        </div>
+
+        <!-- SCENE 5: FRIENDSHIP TIMELINE -->
+        <div class="scene" id="scene-5">
+            <div class="glass-card text-center scrollable-card">
+                <h2>⏳ Our Journey Timeline</h2>
+                <div class="timeline">
+                    <div class="timeline-item"><span class="icon">🌱</span> First Conversation</div>
+                    <div class="timeline-item"><span class="icon">😊</span> First Smile</div>
+                    <div class="timeline-item"><span class="icon">😂</span> First Crazy Laugh</div>
+                    <div class="timeline-item"><span class="icon">📸</span> Beautiful Memories</div>
+                    <div class="timeline-item"><span class="icon">🤝</span> Strong Brotherhood</div>
+                    <div class="timeline-item"><span class="icon">🎉</span> One Beautiful Year</div>
+                </div>
+                <p class="quote-small">"Every beautiful journey begins with a single moment... ours became a collection of unforgettable memories."</p>
+                <button class="btn-glow mt-15" onclick="nextScene()">✨ Continue The Journey</button>
+            </div>
+        </div>
+
+        <!-- SCENE 6: WELCOME SCREEN -->
+        <div class="scene" id="scene-6">
+            <div class="glass-card text-center">
+                <h2>👋 Welcome, Muzammil Tanoli ❤️</h2>
+                <p class="mt-15">You've already crossed the first chapter of this journey. But the most beautiful memories are still waiting for you. Every click from now on will reveal something created especially for you.</p>
+                <button class="btn-glow mt-20" onclick="nextScene()">✨ Open Your Surprise</button>
+            </div>
+        </div>
+
+        <!-- SCENE 7: SECRET ACCESS LOCK -->
+        <div class="scene" id="scene-7">
+            <div class="glass-card text-center">
+                <div class="lock-icon">🔒</div>
+                <h2>Private Access</h2>
+                <p class="hint">Every special memory deserves a special key. Enter the secret code to unlock the next chapter.</p>
+                <div class="pin-box-container">
+                    <input type="password" id="pin-input" placeholder="Enter Password" autocomplete="off">
+                </div>
+                <p class="hint-date">💡 Enter the passcode provided to unlock</p>
+                <p id="pin-error-text" class="error-text hidden">❌ Incorrect Passcode. Try Again.</p>
+                <button class="btn-glow mt-15" onclick="verifySecretPin()">Unlock 🔓</button>
+            </div>
+        </div>
+
+        <!-- SCENE 8: 3D MAGIC CARD -->
+        <div class="scene" id="scene-8">
+            <div class="magic-card-3d" id="magic-card" onclick="flipMagicCard()">
+                <div class="card-inner">
+                    <div class="card-front glass-card text-center">
+                        <h2>🎉 Happy Friendship Anniversary ❤️</h2>
+                        <p class="mt-15">Tap To Open</p>
+                    </div>
+                    <div class="card-back glass-card text-center">
+                        <p>Some friendships begin with a simple "Hello"... but before we realize it, they become one of the most beautiful chapters of our lives. Today isn't just a celebration of time—it's a celebration of every smile, every memory, and every moment that made this friendship truly unforgettable.</p>
+                        <button class="btn-glow mt-15" onclick="event.stopPropagation(); nextScene();">Continue ➡️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCENE 9: FRIENDSHIP QUESTIONS -->
+        <div class="scene" id="scene-9">
+            <div class="glass-card text-center" id="quiz-card">
+                <h2>❓ A Few Questions For You ❤️</h2>
+                <div id="quiz-body" class="mt-15"></div>
+            </div>
+        </div>
+
+        <!-- SCENE 10: WHY YOU ARE SPECIAL -->
+        <div class="scene" id="scene-10">
+            <div class="glass-card text-center scrollable-card">
+                <h2>❤️ Why You're So Special To Me</h2>
+                <p class="hint">Tap each card to flip ✨</p>
+                <div class="flip-grid mt-15">
+                    <div class="flip-card" onclick="handleCardFlip(this)">
+                        <div class="flip-inner">
+                            <div class="flip-front">❤️ Pure Heart</div>
+                            <div class="flip-back">Your kindness is real, and your heart is full of sincerity. Being your friend has always felt safe, peaceful, and genuine.</div>
+                        </div>
+                    </div>
+                    <div class="flip-card" onclick="handleCardFlip(this)">
+                        <div class="flip-inner">
+                            <div class="flip-front">🤝 True Brotherhood</div>
+                            <div class="flip-back">You are more than a friend—you are my brother. No matter what life brings, our bond will always stay strong.</div>
+                        </div>
+                    </div>
+                    <div class="flip-card" onclick="handleCardFlip(this)">
+                        <div class="flip-inner">
+                            <div class="flip-front">😊 My Happiness</div>
+                            <div class="flip-back">One conversation with you can brighten even my hardest day. Your smile and laughter always bring peace to my heart.</div>
+                        </div>
+                    </div>
+                    <div class="flip-card" onclick="handleCardFlip(this)">
+                        <div class="flip-inner">
+                            <div class="flip-front">🔒 My Safe Place</div>
+                            <div class="flip-back">With you, I can be completely myself without fear or hesitation. Thank you for being someone I can always trust.</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-glow mt-15" onclick="nextScene()">Continue ➡️</button>
+            </div>
+        </div>
+
+        <!-- SCENE 11: OFFICIAL BROTHERHOOD OATH -->
+        <div class="scene" id="scene-11">
+            <div class="glass-card text-center scrollable-card">
+                <h2>🤝 Official Brotherhood Oath</h2>
+                <p class="quote-small">"Every unforgettable friendship is built on trust, respect, and the promises we choose to keep."</p>
+                <div class="oath-box">
+                    <p><strong>❤️ Always Respect:</strong> Respect will always remain our strongest foundation.</p>
+                    <p><strong>🤝 Stand Together:</strong> We'll celebrate success & support each other through challenges.</p>
+                    <p><strong>🌟 Protect This Bond:</strong> Measured not by time, but by sincerity and trust.</p>
+                </div>
+                <button id="oath-btn" class="btn-glow mt-15" onclick="acceptOath()">🤝 Accept Brotherhood Oath</button>
+                <div id="oath-status" class="hidden gold-subtitle mt-15">✅ Brotherhood Oath Accepted</div>
+            </div>
+        </div>
+
+        <!-- SCENE 12: INTERACTIVE MEMORY GALLERY -->
+        <div class="scene" id="scene-12">
+            <div class="glass-card text-center scrollable-card">
+                <h2>📸 Our Beautiful Memories</h2>
+                <p class="hint">Tap each memory to reveal ✨</p>
+                <div class="gallery-grid">
+                    <div class="gallery-item" onclick="flipGalleryCard(this)">
+                        <div class="g-front"><img src="pic1.jpg" alt="Memory" onerror="this.src='https://via.placeholder.com/150/ffd700/000?text=Memory+1'"></div>
+                        <div class="g-back">Every picture freezes a moment... but every memory keeps it alive forever.</div>
+                    </div>
+                    <div class="gallery-item" onclick="flipGalleryCard(this)">
+                        <div class="g-front"><img src="pic2.jpg" alt="Memory" onerror="this.src='https://via.placeholder.com/150/ffd700/000?text=Memory+2'"></div>
+                        <div class="g-back">Some smiles never fade, because they were shared with the right person.</div>
+                    </div>
+                    <div class="gallery-item" onclick="flipGalleryCard(this)">
+                        <div class="g-front"><img src="pic3.jpg" alt="Memory" onerror="this.src='https://via.placeholder.com/150/ffd700/000?text=Memory+3'"></div>
+                        <div class="g-back">One photo... countless emotions.</div>
+                    </div>
+                    <div class="gallery-item" onclick="flipGalleryCard(this)">
+                        <div class="g-front"><img src="pic4.jpg" alt="Memory" onerror="this.src='https://via.placeholder.com/150/ffd700/000?text=Memory+4'"></div>
+                        <div class="g-back">The best memories are never planned. They simply happen.</div>
+                    </div>
+                </div>
+                <button class="btn-glow mt-15" onclick="nextScene()">Special Video 🎥</button>
+            </div>
+        </div>
+
+        <!-- SCENE 13: SPECIAL VIDEO SHOWCASE -->
+        <div class="scene" id="scene-13">
+            <div class="glass-card text-center">
+                <h2>🎬 One Special Memory</h2>
+                <p class="hint">"Some moments are too beautiful to be described with words... they deserve to be watched."</p>
+                <div class="video-container mt-15">
+                    <video id="special-video" controls onplay="handleVideoPlay()" onended="handleVideoEnd()">
+                        <source src="video.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <button class="btn-glow mt-15" onclick="nextScene()">Secret Letter 💌</button>
+            </div>
+        </div>
+
+        <!-- SCENE 14: SECRET LETTER -->
+        <div class="scene" id="scene-14">
+            <canvas id="letter-fireworks-canvas"></canvas>
+            <div class="glass-card overlay-card text-center scrollable-card">
+                <h2>💌 Secret Letter</h2>
+                <div class="letter-body" id="secret-typewriter-letter"></div>
+                <button id="letter-next-btn" class="btn-glow mt-15 hidden" onclick="nextScene()">Continue Journey ➡️</button>
+            </div>
+        </div>
+
+        <!-- SCENE 14B: SILENT REFLECTION -->
+        <div class="scene" id="scene-14b">
+            <canvas id="galaxy-canvas-14b"></canvas>
+            <div class="silent-reflection-box text-center overlay-card">
+                <p class="cinematic-quote">"Some moments are too beautiful to rush...<br>Some words deserve to stay in the heart a little longer."</p>
+            </div>
+        </div>
+
+        <!-- SCENE 15: FINAL GIFT BOX -->
+        <div class="scene" id="scene-15">
+            <canvas id="galaxy-canvas-15"></canvas>
+            <div class="glass-card text-center overlay-card">
+                <h2>🎁 One Last Surprise</h2>
+                <p class="hint">Everything you've seen so far was just the beginning... the biggest surprise is still waiting inside this box.</p>
+                <div class="gift-box" id="gift-box" onclick="openGiftBox()">
+                    <div class="gift-ribbon"></div>
+                    🎁
+                </div>
+            </div>
+        </div>
+
+        <!-- SCENE 16: GRAND 7-COLOR FIREWORKS CELEBRATION -->
+        <div class="scene" id="scene-16">
+            <canvas id="fireworks-canvas"></canvas>
+            <div class="glass-card overlay-card text-center">
+                <h1>🎉 Happy Friendship Anniversary 🎉</h1>
+                <h2 class="gold-subtitle mt-15">365 Days ❤️ • Countless Smiles 😊</h2>
+                <p class="mt-15">Infinite Memories 📸 • One Beautiful Brotherhood 🤝</p>
+                <button class="btn-glow mt-20" onclick="nextScene()">Friendship Awards 🏆</button>
+            </div>
+        </div>
+
+        <!-- SCENE 17: FRIENDSHIP AWARDS (EASTER EGG 3 TRIGGER) -->
+        <div class="scene" id="scene-17">
+            <div class="glass-card text-center scrollable-card">
+                <h2>🏆 Friendship Awards 2026</h2>
+                <div class="award-list mt-15">
+                    <div class="award-card">🥇 Lifetime Brotherhood Award</div>
+                    <div class="award-card">😂 Best Smile Maker</div>
+                    <div class="award-card">🤝 Most Genuine Friend</div>
+                    <!-- Trigger 3: Special Award Click -->
+                    <div class="award-card special-promise-award" onclick="triggerEasterEggPopup()">
+                        🌟 <strong>Everlasting Support Promise Award</strong><br>
+                        <small>"Jab bhi aapko meri zaroorat hogi, aapke bolne se pehle aa jaunga! ❤️"</small>
+                    </div>
+                </div>
+                <h3 class="gold-subtitle mt-15">Congratulations, Muzammil ❤️</h3>
+                <button class="btn-glow mt-15" onclick="nextScene()">Wishes Wall 🌠</button>
+            </div>
+        </div>
+
+        <!-- SCENE 18: WISHES WALL -->
+        <div class="scene" id="scene-18">
+          <canvas id="wishes-fireworks-canvas"></canvas>
+            <div class="glass-card text-center scrollable-card overlay-card">
+                <h2>🌠 My Wishes For You</h2>
+                <ul class="wishes-list">
+                    <li>⭐ Stay Happy & Healthy.</li>
+                    <li>⭐ Keep Smiling & Growing.</li>
+                    <li>⭐ Always Achieve Your Dreams.</li>
+                    <li>⭐ May Our Brotherhood Stay Strong Forever.</li>
+                </ul>
+                <button class="btn-glow mt-15" onclick="nextScene()">Final Message ❤️</button>
+            </div>
+        </div>
+
+        <!-- SCENE 19: CINEMATIC ENDING -->
+        <div class="scene" id="scene-19">
+            <canvas id="ending-stars-canvas"></canvas>
+            <div class="glass-card overlay-card text-center scrollable-card" id="ending-card">
+                <div class="final-msg-body" id="final-cinematic-text"></div>
+                <div class="signature-section" id="final-signature">
+                    <p class="sig-title">Thank you for being one of the most valuable parts of my life.<br>This journey became beautiful because you were a part of it.</p>
+                    <div class="sig-bond mt-15">
+                        Mohsin Tariq ❤️ Muzammil Tanoli<br>
+                        <small>One Heart • One Brotherhood • Countless Memories</small>
+                    </div>
+                    <h1 class="the-end-title mt-20" id="the-end-text">THE END</h1>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MULTI-EASTER EGG MODAL -->
+    <div id="easter-modal" class="modal hidden">
+        <div class="glass-card text-center">
+            <h2 id="easter-modal-title">🎉 Secret Unlocked!</h2>
+            <p class="mt-15" id="easter-modal-text">You unlocked the secret point! 🌟 (+100 Brotherhood Points)</p>
+            <h3 class="gold-subtitle mt-15" id="easter-modal-sub"></h3>
+            <button class="btn-glow mt-15" onclick="closeEasterModalAndContinue()">Continue ➡️</button>
+        </div>
+    </div>
+
+    <!-- BLACK FADE OUT OVERLAY -->
+    <div id="black-fade-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:black; opacity:0; pointer-events:none; transition:opacity 3.5s ease; z-index:99999;"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

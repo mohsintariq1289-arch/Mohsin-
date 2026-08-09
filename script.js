@@ -1,359 +1,371 @@
-// ==========================================
-// GLOBAL STATE & VARIABLES
-// ==========================================
+// ============================================================
+// MOHSIN ❤️ MUZAMMIL — FINAL JOURNEY ENGINE
+// ============================================================
+
 let currentScene = 1;
-const totalScenes = 20;
+const sceneSequence = [1,2,3,4,20,5,6,7,8,9,10,11,12,21,13,14,"14b",15,16,17,18,19];
 let isMusicPlaying = false;
 let galaxyAnimationId = null;
 let fireworksAnimationId = null;
+let statsTimer = null;
+let finalStarted = false;
 
-// ==========================================
-// 1. CLOCK FUNCTION
-// ==========================================
-function updateClock() {
-    const clockElem = document.getElementById('clock');
-    if (clockElem) {
-        const now = new Date();
-        const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        clockElem.innerText = now.toLocaleDateString('en-GB', options);
-    }
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// ==========================================
-// 2. MUSIC TOGGLE
-// ==========================================
-function toggleMusic() {
-    const bgMusic = document.getElementById('bg-music');
-    const btn = document.getElementById('music-toggle-btn');
-    if (!bgMusic) return;
-
-    if (isMusicPlaying) {
-        bgMusic.pause();
-        if (btn) btn.innerText = '🎵 Play Music';
-        isMusicPlaying = false;
-    } else {
-        bgMusic.play().then(() => {
-            if (btn) btn.innerText = '⏸ Pause Music';
-            isMusicPlaying = true;
-        }).catch((err) => {
-            console.log("Audio play error:", err);
+// CLOCK
+function updateClock(){
+    const el=document.getElementById("clock");
+    if(el){
+        const now=new Date();
+        el.textContent=now.toLocaleString("en-GB",{
+            day:"2-digit",month:"short",year:"numeric",
+            hour:"2-digit",minute:"2-digit",second:"2-digit"
         });
     }
 }
+setInterval(updateClock,1000); updateClock();
 
-// ==========================================
-// 3. PRELOADER LOGIC
-// ==========================================
-function hidePreloader() {
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-        preloader.style.opacity = '0';
-        preloader.style.visibility = 'hidden';
-        setTimeout(() => {
-            preloader.style.display = 'none';
-            startScene1Animation();
-        }, 800);
+// MUSIC
+function toggleMusic(){
+    const audio=document.getElementById("bg-music"),btn=document.getElementById("music-toggle-btn");
+    if(!audio)return;
+    if(isMusicPlaying){
+        audio.pause(); isMusicPlaying=false;
+        if(btn)btn.textContent="🎵 Play Music";
+    }else{
+        audio.play().then(()=>{
+            isMusicPlaying=true;
+            if(btn)btn.textContent="⏸ Pause Music";
+        }).catch(()=>alert("Tap the music button again to start the music."));
     }
 }
 
-if (document.readyState === 'complete') {
-    setTimeout(hidePreloader, 1500);
-} else {
-    window.addEventListener('load', () => setTimeout(hidePreloader, 1500));
-    setTimeout(hidePreloader, 2500);
+// PRELOADER
+function hidePreloader(){
+    const p=document.getElementById("preloader");
+    if(!p)return;
+    p.style.opacity="0";p.style.visibility="hidden";
+    setTimeout(()=>{p.style.display="none";startScene1Animation()},800);
 }
+window.addEventListener("load",()=>setTimeout(hidePreloader,1200));
+setTimeout(hidePreloader,3000);
 
-// ==========================================
-// 4. NAVIGATION SYSTEM
-// ==========================================
-function nextScene() {
-    if (galaxyAnimationId) { cancelAnimationFrame(galaxyAnimationId); galaxyAnimationId = null; }
-    if (fireworksAnimationId) { cancelAnimationFrame(fireworksAnimationId); fireworksAnimationId = null; }
-
-    const currentElem = document.getElementById(`scene-${currentScene}`);
-    if (currentElem) currentElem.classList.remove('active');
-
-    if (currentScene === 14) {
-        currentScene = '14b';
-    } else if (currentScene === '14b') {
-        currentScene = 15;
-    } else {
-        currentScene++;
-    }
-
-    const nextElem = document.getElementById(`scene-${currentScene}`);
-    if (nextElem) {
-        nextElem.classList.add('active');
+// NAVIGATION — explicit sequence prevents scene numbering bugs
+function nextScene(){
+    stopBackgroundAnimations();
+    const index=sceneSequence.indexOf(currentScene);
+    if(index<0 || index>=sceneSequence.length-1)return;
+    const old=document.getElementById(`scene-${currentScene}`);
+    if(old)old.classList.remove("active");
+    currentScene=sceneSequence[index+1];
+    const next=document.getElementById(`scene-${currentScene}`);
+    if(next){
+        next.classList.add("active");
         initSceneLogic(currentScene);
     }
 }
-
-function initSceneLogic(sceneId) {
-    if (sceneId === 3) initBalloonGame();
-    if (sceneId === 9) loadQuizQuestion();
-    if (sceneId === 14) startTypewriterLetter();
-    if (sceneId === '14b') { startSilentReflection(); startGalaxyBackground('galaxy-canvas-14b'); }
-    if (sceneId === 15) { startGalaxyBackground('galaxy-canvas-15'); }
-    if (sceneId === 16) triggerFireworks();
-    if (sceneId === 18) startWishesFireworks();
-    if (sceneId === 19) { startFinalEndingSequence(); }
+function stopBackgroundAnimations(){
+    if(galaxyAnimationId){cancelAnimationFrame(galaxyAnimationId);galaxyAnimationId=null}
+    if(fireworksAnimationId){cancelAnimationFrame(fireworksAnimationId);fireworksAnimationId=null}
+}
+function initSceneLogic(id){
+    if(id===3)initBalloonGame();
+    if(id===20)start365Days();
+    if(id===9)loadQuizQuestion();
+    if(id===21)startMemoryGalaxy();
+    if(id===14)startTypewriterLetter();
+    if(id==="14b"){startSilentReflection();startGalaxyBackground("galaxy-canvas-14b")}
+    if(id===15)startGalaxyBackground("galaxy-canvas-15");
+    if(id===16)triggerFireworks();
+    if(id===18)startWishesFireworks();
+    if(id===19)startFinalEndingSequence();
 }
 
-// ==========================================
-// 5. SCENE 1: CINEMATIC QUOTES
-// ==========================================
-function startScene1Animation() {
-    const q1 = document.getElementById('quote-1');
-    const q2 = document.getElementById('quote-2');
-
-    if (!q1 || !q2) return;
-
-    q1.classList.remove('hidden');
-    setTimeout(() => {
-        q1.classList.add('hidden');
-        setTimeout(() => {
-            q2.classList.remove('hidden');
-            setTimeout(() => {
-                q2.classList.add('hidden');
-                setTimeout(nextScene, 1000);
-            }, 4000);
-        }, 1000);
-    }, 4000);
+// SCENE 1
+function startScene1Animation(){
+    const q1=document.getElementById("quote-1"),q2=document.getElementById("quote-2");
+    if(!q1||!q2)return;
+    q1.classList.remove("hidden");
+    setTimeout(()=>{
+        q1.classList.add("hidden");
+        setTimeout(()=>{
+            q2.classList.remove("hidden");
+            setTimeout(()=>{
+                q2.classList.add("hidden");
+                setTimeout(nextScene,900);
+            },4000);
+        },900);
+    },4000);
 }
 
-// ==========================================
-// 6. SCENE 3: BALLOON GAME
-// ==========================================
-const balloonWords = ["Trust", "Brotherhood", "Respect", "Loyalty", "Kindness", "Support", "Care", "Memories", "Smile", "Family"];
-let poppedCount = 0;
-
-function initBalloonGame() {
-    const container = document.getElementById('balloon-container');
-    if (!container) return;
-
-    container.innerHTML = '';
-    poppedCount = 0;
-    const popElem = document.getElementById('pop-count');
-    const revealedList = document.getElementById('revealed-words-list');
-    if (popElem) popElem.innerText = 0;
-    if (revealedList) revealedList.innerHTML = '';
-
-    balloonWords.forEach((word, idx) => {
-        const b = document.createElement('div');
-        b.className = 'balloon';
-        b.style.left = `${10 + (idx * 8)}%`;
-        b.style.animationDelay = `${Math.random() * 2}s`;
-        b.onclick = () => popBalloon(b, word);
-        container.appendChild(b);
+// BALLOONS
+const balloonWords=["Trust","Brotherhood","Respect","Loyalty","Kindness","Support","Care","Memories","Smile","Family"];
+let poppedCount=0;
+function initBalloonGame(){
+    const c=document.getElementById("balloon-container"); if(!c)return;
+    c.innerHTML="";poppedCount=0;
+    document.getElementById("pop-count").textContent="0";
+    document.getElementById("revealed-words-list").innerHTML="";
+    balloonWords.forEach((word,i)=>{
+        const b=document.createElement("div");b.className="balloon";
+        b.style.left=`${5+i*9}%`;b.style.animationDelay=`${Math.random()*2}s`;
+        b.onclick=()=>popBalloon(b,word);c.appendChild(b);
     });
 }
-
-function popBalloon(elem, word) {
-    elem.remove();
-    poppedCount++;
-    const popElem = document.getElementById('pop-count');
-    if (popElem) popElem.innerText = poppedCount;
-
-    const badge = document.createElement('span');
-    badge.className = 'word-badge';
-    badge.innerText = word;
-    const list = document.getElementById('revealed-words-list');
-    if (list) list.appendChild(badge);
-
-    if (poppedCount >= balloonWords.length) {
-        const nextBtn = document.getElementById('balloon-next-btn');
-        if (nextBtn) nextBtn.classList.remove('hidden');
-    }
+function popBalloon(el,word){
+    if(!el||!el.parentNode)return;
+    el.remove();poppedCount++;
+    document.getElementById("pop-count").textContent=poppedCount;
+    const badge=document.createElement("span");badge.className="word-badge";badge.textContent=word;
+    document.getElementById("revealed-words-list").appendChild(badge);
+    if(poppedCount===balloonWords.length)document.getElementById("balloon-next-btn").classList.remove("hidden");
 }
 
-// ==========================================
-// 7. SCENE 4: HEART EXPLOSION
-// ==========================================
-function explodeHeart() {
+// EASTER EGGS
+function triggerEasterEggPopup(){
+    const modal=document.getElementById("easter-modal");
+    if(!modal)return;
+    modal.innerHTML=`<div class="glass-card text-center">
+        <h2>🎉 Secret Unlocked!</h2>
+        <p class="mt-15">You found a hidden piece of the journey. 🌟</p>
+        <h3 class="gold-subtitle mt-15">+100 Brotherhood Points ❤️</h3>
+        <button class="btn-glow mt-20" onclick="closeEasterModalAndContinue()">Continue ➡️</button>
+    </div>`;
+    modal.classList.remove("hidden");
+}
+function closeEasterModalAndContinue(){
+    document.getElementById("easter-modal").classList.add("hidden");
     nextScene();
 }
-
-// ==========================================
-// 8. SCENE 7: PASSCODE LOGIC
-// ==========================================
-function verifySecretPin() {
-    const pinInput = document.getElementById('pin-input');
-    if (!pinInput) return;
-    
-    const pin = pinInput.value.trim();
-    if (pin === "160926" || pin === "2026" || pin === "16" || pin === "786") {
+function verifySecretPin(){
+    const input=document.getElementById("pin-input");if(!input)return;
+    const ok=["160926","2026","16","786"].includes(input.value.trim());
+    if(ok){
+        document.getElementById("pin-error-text").classList.add("hidden");
         triggerEasterEggPopup();
-    } else {
-        const err = document.getElementById('pin-error-text');
-        if (err) err.classList.remove('hidden');
+    }else document.getElementById("pin-error-text").classList.remove("hidden");
+}
+
+// MAGIC CARD
+function flipMagicCard(){document.getElementById("magic-card")?.classList.toggle("flipped")}
+
+// HEART
+function explodeHeart(){nextScene()}
+
+// ============================================================
+// NEW FEATURE 1 — 365 DAYS
+// ============================================================
+function start365Days(){
+    clearTimeout(statsTimer);
+    const holder=document.getElementById("year-stats"),caption=document.getElementById("stats-caption"),heart=document.getElementById("stats-heart");
+    if(!holder)return;
+    holder.innerHTML="";
+    caption.classList.remove("show");heart.classList.add("hidden");
+    const stats=[
+        ["365","DAYS"],
+        ["8,760","HOURS"],
+        ["525,600","MINUTES"],
+        ["31,536,000+","SECONDS"]
+    ];
+    let i=0;
+    function showNext(){
+        if(i>=stats.length){
+            caption.classList.add("show");
+            statsTimer=setTimeout(()=>{
+                holder.style.transition="1.2s";holder.style.opacity="0";
+                caption.style.opacity="0";
+                setTimeout(()=>{
+                    holder.innerHTML="";
+                    holder.style.opacity="1";
+                    heart.classList.remove("hidden");
+                    statsTimer=setTimeout(nextScene,3000);
+                },1200);
+            },3000);
+            return;
+        }
+        const [num,label]=stats[i++];
+        holder.innerHTML=`<div class="stat-line active-stat">${num} <span>${label}</span></div>`;
+        statsTimer=setTimeout(()=>{
+            const line=holder.querySelector(".stat-line");
+            if(line)line.classList.remove("active-stat");
+            setTimeout(showNext,500);
+        },2100);
     }
+    showNext();
 }
 
-function triggerEasterEggPopup() {
-    const modal = document.getElementById('easter-modal');
-    if (modal) {
-        modal.innerHTML = `
-            <div class="glass-card text-center">
-                <h2>🎉 Wow! We found Easter Egg!</h2>
-                <p class="mt-15">You unlocked the secret point! 🌟 (+100 Brotherhood Points)</p>
-                <button class="btn-glow mt-20" onclick="closeEasterModalAndContinue()">Continue ➡️</button>
-            </div>
-        `;
-        modal.classList.remove('hidden');
-    } else {
-        nextScene();
-    }
-}
-
-function closeEasterModalAndContinue() {
-    const modal = document.getElementById('easter-modal');
-    if (modal) modal.classList.add('hidden');
-    nextScene();
-}
-
-// ==========================================
-// 9. SCENE 8: MAGIC CARD FLIP
-// ==========================================
-function flipMagicCard() {
-    const card = document.getElementById('magic-card');
-    if (card) card.classList.toggle('flipped');
-}
-
-// ==========================================
-// 10. SCENE 9: QUESTION SYSTEM
-// ==========================================
-const customQuestions = [
+// QUIZ + SPECIAL HEART QUESTION
+const customQuestions=[
     "Q1. What is the most memorable moment of our friendship?",
     "Q2. What is the best quality you have seen in me till today?",
     "Q3. What is the funniest memory you have of us?",
     "Q4. What is one thing you want me to improve in the coming year?"
 ];
+let currentQuestionIdx=0;
+const userAnswers={};
+let heartQuestionShown=false;
 
-let currentQuestionIdx = 0;
-const userAnswers = {};
-
-function loadQuizQuestion() {
-    const body = document.getElementById('quiz-body');
-    if (!body) return;
-
-    if (currentQuestionIdx >= customQuestions.length) {
-        body.innerHTML = `
-            <div class="gold-subtitle text-center">🔒 All Answers Locked!</div>
-            <p class="mt-15 text-center">Thank you for sharing these precious memories.</p>
-            <div class="text-center">
-                <button class="btn-glow mt-15" onclick="nextScene()">Next ➡️</button>
-            </div>
-        `;
+function loadQuizQuestion(){
+    const body=document.getElementById("quiz-body");if(!body)return;
+    if(currentQuestionIdx<customQuestions.length){
+        const q=customQuestions[currentQuestionIdx];
+        body.innerHTML=`<div id="question-card" class="question-container">
+            <p class="question-title"><strong>${q}</strong></p>
+            <textarea id="answer-input" rows="3" placeholder="Write your answer here..." class="custom-textarea mt-15"></textarea>
+            <button class="btn-glow mt-15" onclick="submitAndLockAnswer()">🔒 Lock Answer & Next</button>
+        </div>`;
         return;
     }
-
-    const qText = customQuestions[currentQuestionIdx];
-    
-    body.innerHTML = `
-        <div id="question-card" class="question-container">
-            <p class="question-title"><strong>${qText}</strong></p>
-            <div class="input-lock-wrapper mt-15">
-                <textarea id="answer-input" rows="3" placeholder="Write your answer here..." class="custom-textarea"></textarea>
-                <button id="lock-btn" class="btn-glow mt-15" onclick="submitAndLockAnswer()">🔒 Lock Answer & Next</button>
-            </div>
-        </div>
-    `;
-}
-
-function submitAndLockAnswer() {
-    const inputElem = document.getElementById('answer-input');
-    const qCard = document.getElementById('question-card');
-    
-    if (!inputElem || !inputElem.value.trim()) {
-        alert("Please write an answer before locking! ❤️");
+    if(!heartQuestionShown){
+        heartQuestionShown=true;
+        body.innerHTML=`<div id="heart-question-card" class="question-container">
+            <p class="question-title"><strong>❤️ After everything we've shared… what does our friendship mean to you?</strong></p>
+            <p class="hint">This one is different. Write whatever your heart wants to say.</p>
+            <textarea id="heart-answer-input" rows="5" placeholder="Write From Your Heart..." class="custom-textarea mt-15"></textarea>
+            <button class="btn-glow mt-15" onclick="keepHeartMemory()">💌 Write From Your Heart</button>
+        </div>`;
         return;
     }
-
-    userAnswers[`Q${currentQuestionIdx + 1}`] = inputElem.value.trim();
-
-    if (qCard) {
-        qCard.style.transition = "all 0.5s ease";
-        qCard.style.opacity = "0";
-        qCard.style.transform = "translateY(-20px)";
-    }
-
-    setTimeout(() => {
-        currentQuestionIdx++;
-        loadQuizQuestion();
-    }, 500);
+    body.innerHTML=`<div class="gold-subtitle text-center">🔒 All Answers Locked!</div>
+        <p class="mt-15 text-center">Your memories have been safely kept inside this journey. ❤️</p>
+        <button class="btn-glow mt-15" onclick="nextScene()">Next ➡️</button>`;
+}
+function submitAndLockAnswer(){
+    const input=document.getElementById("answer-input");
+    if(!input||!input.value.trim()){alert("Please write an answer before locking! ❤️");return}
+    userAnswers["Q"+(currentQuestionIdx+1)]=input.value.trim();
+    const card=document.getElementById("question-card");
+    card.style.opacity="0";card.style.transform="translateY(-20px)";
+    setTimeout(()=>{currentQuestionIdx++;loadQuizQuestion()},500);
+}
+function keepHeartMemory(){
+    const input=document.getElementById("heart-answer-input");
+    if(!input||!input.value.trim()){alert("Write something from your heart first. ❤️");return}
+    userAnswers.heart=input.value.trim();
+    const body=document.getElementById("quiz-body");
+    body.innerHTML=`<div class="heart-memory-saved">
+        <div style="font-size:3rem">🔒❤️</div>
+        <p class="mt-15">Some answers don't need to be shared…<br>they simply deserve to be remembered. ❤️</p>
+        <button class="btn-glow mt-20" onclick="nextScene()">Continue Journey ➡️</button>
+    </div>`;
 }
 
-// ==========================================
-// 11. AUTO-RESET CARD FLIP SYSTEM FOR SCENE 10
-// ==========================================
-function handleCardFlip(selectedCard) {
-    const allCards = document.querySelectorAll('#scene-10 .flip-card');
-    const isAlreadyFlipped = selectedCard.classList.contains('flipped');
-    
-    allCards.forEach(card => {
-        card.classList.remove('flipped');
+// CARDS
+function handleCardFlip(card){
+    document.querySelectorAll("#scene-10 .flip-card").forEach(c=>c.classList.remove("flipped"));
+    card.classList.add("flipped");
+}
+function acceptOath(){
+    document.getElementById("oath-btn").classList.add("hidden");
+    document.getElementById("oath-status").classList.remove("hidden");
+    setTimeout(nextScene,1500);
+}
+function flipGalleryCard(el){el.classList.toggle("flipped")}
+
+// VIDEO
+function handleVideoPlay(){
+    const a=document.getElementById("bg-music");if(isMusicPlaying&&a)a.volume=.2;
+}
+function handleVideoEnd(){
+    const a=document.getElementById("bg-music");if(isMusicPlaying&&a)a.volume=1;
+}
+
+// ============================================================
+// NEW FEATURE 2 — MEMORY GALAXY
+// ============================================================
+const galaxyMemories=[
+    "That one conversation we still remember… ❤️",
+    "That random moment that became a beautiful memory… ✨",
+    "The laughs that made ordinary days special… 😂",
+    "A simple message that somehow changed the whole day… 💬",
+    "The moments when friendship felt like family… 🤝",
+    "The memories we never planned but will never forget… 📸",
+    "Every difficult day that became easier because we had each other… 🌙",
+    "One beautiful year — and so many pages still waiting to be written… ❤️"
+];
+let galaxyFound=new Set(),galaxyStars=[],galaxyLines=[],galaxyCanvasAnimation=null;
+
+function startMemoryGalaxy(){
+    const scene=document.getElementById("scene-21"),canvas=document.getElementById("memory-galaxy-canvas");
+    const memory=document.getElementById("galaxy-memory");
+    const progress=document.getElementById("galaxy-progress");
+    const next=document.getElementById("galaxy-next-btn");
+    if(!canvas)return;
+    galaxyFound=new Set();galaxyStars=[];galaxyLines=[];
+    memory.classList.remove("show");memory.textContent="Tap a star ✨";next.classList.add("hidden");
+    progress.textContent="Memories discovered: 0 / 8";
+    canvas.width=innerWidth;canvas.height=innerHeight;
+    const ctx=canvas.getContext("2d");
+    const bgStars=Array.from({length:190},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+.3,a:Math.random()}));
+    const positions=[
+        [.15,.28],[.33,.18],[.58,.25],[.78,.18],
+        [.22,.57],[.46,.68],[.72,.55],[.84,.72]
+    ];
+    positions.forEach((p,i)=>{
+        const s=document.createElement("div");s.className="galaxy-star";
+        s.style.left=`${p[0]*100}%`;s.style.top=`${p[1]*100}%`;
+        const size=7+Math.random()*5;s.style.width=size+"px";s.style.height=size+"px";
+        s.title="Tap to discover memory";
+        s.onclick=()=>discoverGalaxyStar(i,s);
+        scene.appendChild(s);galaxyStars.push(s);
     });
-    
-    if (!isAlreadyFlipped) {
-        selectedCard.classList.add('flipped');
+    function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        bgStars.forEach(st=>{
+            st.a+=.01*(Math.random()>.5?1:-1);st.a=Math.max(.15,Math.min(1,st.a));
+            ctx.fillStyle=`rgba(255,255,255,${st.a})`;ctx.beginPath();ctx.arc(st.x,st.y,st.r,0,Math.PI*2);ctx.fill();
+        });
+        galaxyLines.forEach(l=>{
+            ctx.strokeStyle="rgba(255,215,0,.5)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(l.x1,l.y1);ctx.lineTo(l.x2,l.y2);ctx.stroke();
+        });
+        galaxyCanvasAnimation=requestAnimationFrame(draw);
+    }
+    draw();
+}
+function discoverGalaxyStar(i,el){
+    if(galaxyFound.has(i))return;
+    galaxyFound.add(i);el.classList.add("found");
+    const box=document.getElementById("galaxy-memory");
+    box.textContent=galaxyMemories[i];box.classList.remove("show");
+    setTimeout(()=>box.classList.add("show"),30);
+    document.getElementById("galaxy-progress").textContent=`Memories discovered: ${galaxyFound.size} / 8`;
+    if(galaxyFound.size===galaxyMemories.length){
+        connectGalaxyStars();
+        setTimeout(()=>{
+            box.innerHTML=`<strong style="font-size:2rem">M ❤️ M</strong><br><small>One Heart • One Brotherhood</small>`;
+            document.getElementById("galaxy-next-btn").classList.remove("hidden");
+        },1200);
     }
 }
-
-// ==========================================
-// 12. SCENE 11: OATH
-// ==========================================
-function acceptOath() {
-    const btn = document.getElementById('oath-btn');
-    const status = document.getElementById('oath-status');
-    if (btn) btn.classList.add('hidden');
-    if (status) status.classList.remove('hidden');
-    setTimeout(nextScene, 1500);
+function connectGalaxyStars(){
+    const canvas=document.getElementById("memory-galaxy-canvas");
+    if(!canvas)return;
+    const rect=canvas.getBoundingClientRect();
+    galaxyStars.forEach((s,i)=>{
+        const a=s.getBoundingClientRect(),b=galaxyStars[(i+1)%galaxyStars.length].getBoundingClientRect();
+        galaxyLines.push({
+            x1:a.left+a.width/2-rect.left,y1:a.top+a.height/2-rect.top,
+            x2:b.left+b.width/2-rect.left,y2:b.top+b.height/2-rect.top
+        });
+    });
 }
 
-// ==========================================
-// 13. SCENE 12: GALLERY FLIP
-// ==========================================
-function flipGalleryCard(elem) {
-    if (elem) elem.classList.toggle('flipped');
-}
-
-// ==========================================
-// 14. SCENE 13: VIDEO CONTROLS
-// ==========================================
-function handleVideoPlay() {
-    const bgMusic = document.getElementById('bg-music');
-    if (isMusicPlaying && bgMusic) bgMusic.volume = 0.2;
-}
-
-function handleVideoEnd() {
-    const bgMusic = document.getElementById('bg-music');
-    if (isMusicPlaying && bgMusic) bgMusic.volume = 1.0;
-}
-
-// ==========================================
-// 15. SCENE 14: TYPEWRITER LETTER
-// ==========================================
-const letterText = `Dear Muzammil,
+// LETTER
+const letterText=`Dear Muzammil,
 
 If you're reading this, then congratulations… you have successfully unlocked a small world that I created just for you. Every screen, every animation, every flower, and every little detail in this gift carries a small piece of my heart.
 
 When we first became friends, I never imagined that one day our friendship would become such an important part of my life. I never knew that an ordinary beginning could turn into something so beautiful, something that would give me so many memories, smiles, laughs, conversations, and moments that I would always want to keep close to my heart.
 
-Our friendship isn't just about the conversations we've had or the memories we've created. It's about the comfort of knowing that there is someone whose presence makes life feel a little more complete. There are moments when I realize that if you weren't a part of my life, something would genuinely feel incomplete.
+Our friendship isn't just about the conversations we've had or the memories we've created. It's about the comfort of knowing that there is someone whose presence makes life feel a little more complete.
 
-You have been a part of so many ordinary moments that somehow became extraordinary just because we shared them together. The laughs, the random conversations, the silly moments, the serious talks, the little memories that might seem small to someone else—all of them mean something to me.
+You have been a part of so many ordinary moments that somehow became extraordinary just because we shared them together.
 
-And honestly, there are some feelings that are difficult to say face to face. Sometimes the heart has so much to say that words simply don't feel enough. That's why I created this little journey for you. Every flower, every card, every animation and every message is my way of saying something that I might not always be able to say aloud:
+And honestly, there are some feelings that are difficult to say face to face. That's why I created this little journey for you.
 
 You are genuinely important to me. ❤️
 
-Thank you for every laugh we shared, every memory we created, every conversation, and every moment that became a part of our story. Thank you for being someone whose friendship I can look back on and feel genuinely grateful for.
+Thank you for every laugh we shared, every memory we created, every conversation, and every moment that became a part of our story.
 
-If someday you ever wonder how much this friendship means to me, just remember this little surprise. I didn't create all of this because I had to. I created it because you matter enough to me that I wanted to turn my feelings into something you could actually see, read, and remember.
-
-And maybe years from now, when we look back at these days, we won't remember every conversation or every little detail. But I hope we'll remember the feeling—the happiness, the laughter, and the beautiful bond we shared.
+If someday you ever wonder how much this friendship means to me, just remember this little surprise. I created it because you matter enough to me that I wanted to turn my feelings into something you could actually see, read, and remember.
 
 Muzammil, you are not just a name in my memories. You are a part of my journey, a part of my happiest memories, and a part of the person I have become.
 
@@ -372,367 +384,152 @@ Mohsin Tariq ❤️
 
 Happy One Year of Brotherhood, Muzammil. 🤝❤️`;
 
-function startTypewriterLetter() {
-    const elem = document.getElementById('secret-typewriter-letter');
-    if (!elem) return;
-    elem.innerHTML = '';
-    let i = 0;
+function startTypewriterLetter(){
+    const el=document.getElementById("secret-typewriter-letter");if(!el)return;
+    el.innerHTML="";document.getElementById("letter-next-btn").classList.add("hidden");
+    let i=0;
+    function type(){
+        if(i<letterText.length){
+            el.innerHTML+=letterText[i]==="\n"?"<br>":letterText[i++];
+            el.scrollTop=el.scrollHeight;setTimeout(type,25);
+        }else document.getElementById("letter-next-btn").classList.remove("hidden");
+    } type();
+}
+function startSilentReflection(){setTimeout(nextScene,6000)}
+function openGiftBox(){
+    const b=document.getElementById("gift-box");if(b)b.style.transform="scale(1.3) rotate(10deg)";
+    setTimeout(nextScene,1000);
+}
 
-    function type() {
-        if (i < letterText.length) {
-            const char = letterText.charAt(i);
-            elem.innerHTML += char === '\n' ? '<br>' : char;
-            i++;
-            elem.scrollTop = elem.scrollHeight;
-            setTimeout(type, 30);
-        } else {
-            const nextBtn = document.getElementById('letter-next-btn');
-            if (nextBtn) {
-                nextBtn.classList.remove('hidden');
-            } else {
-                setTimeout(nextScene, 4000);
-            }
+// GALAXY BACKGROUND
+function startGalaxyBackground(id){
+    const c=document.getElementById(id);if(!c)return;
+    const ctx=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+    const stars=Array.from({length:180},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+.5,a:Math.random(),s:Math.random()*.02+.005}));
+    function render(){
+        ctx.fillStyle="rgba(5,5,12,.3)";ctx.fillRect(0,0,c.width,c.height);
+        stars.forEach(s=>{s.a+=s.s;if(s.a>1||s.a<0)s.s=-s.s;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${Math.abs(s.a)})`;ctx.shadowBlur=8;ctx.shadowColor="#ffd700";ctx.fill()});
+        galaxyAnimationId=requestAnimationFrame(render);
+    }render();
+}
+
+// FIREWORKS
+function triggerFireworks(){
+    const c=document.getElementById("fireworks-canvas");if(!c)return;
+    const ctx=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+    const colors=["#ff0055","#ffd700","#00e5ff","#ff9900","#b026ff","#00ff66","#ffffff"];
+    let particles=[];
+    class P{
+        constructor(x,y,color){this.x=x;this.y=y;this.color=color;const a=Math.random()*Math.PI*2,s=Math.random()*6+2;this.vx=Math.cos(a)*s;this.vy=Math.sin(a)*s;this.alpha=1;this.decay=Math.random()*.015+.008}
+        update(){this.x+=this.vx;this.y+=this.vy;this.vy+=.05;this.alpha-=this.decay}
+        draw(){ctx.globalAlpha=this.alpha;ctx.fillStyle=this.color;ctx.beginPath();ctx.arc(this.x,this.y,2.5,0,Math.PI*2);ctx.shadowBlur=10;ctx.shadowColor=this.color;ctx.fill();ctx.globalAlpha=1}
+    }
+    let frame=0;
+    function loop(){
+        ctx.fillStyle="rgba(5,5,8,.2)";ctx.fillRect(0,0,c.width,c.height);
+        if(frame%20===0){const x=Math.random()*c.width*.8+c.width*.1,y=Math.random()*c.height*.5+c.height*.1,col=colors[Math.floor(Math.random()*colors.length)];for(let i=0;i<50;i++)particles.push(new P(x,y,col))}
+        particles=particles.filter(p=>{p.update();p.draw();return p.alpha>0});frame++;fireworksAnimationId=requestAnimationFrame(loop);
+    }loop();
+}
+
+// WISHES FIREWORKS
+function startWishesFireworks(){
+    const c=document.getElementById("wishes-fireworks-canvas");if(!c)return;
+    const ctx=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+    let particles=[];
+    function boom(){const x=Math.random()*c.width,y=Math.random()*c.height*.5;for(let i=0;i<30;i++){const a=Math.random()*Math.PI*2,s=Math.random()*4+1;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,a:1})}}
+    const interval=setInterval(()=>{if(document.getElementById("scene-18")?.classList.contains("active"))boom();else clearInterval(interval)},500);
+    function render(){if(!document.getElementById("scene-18")?.classList.contains("active"))return;ctx.fillStyle="rgba(5,5,8,.2)";ctx.fillRect(0,0,c.width,c.height);particles=particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.a-=.015;ctx.globalAlpha=p.a;ctx.fillStyle="#ffd700";ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fill();return p.a>0});ctx.globalAlpha=1;requestAnimationFrame(render)}render();
+}
+
+// ============================================================
+// NEW FEATURE 4 — WAIT... ONE LAST THING
+// ============================================================
+const finalMsgText=`Some friendships are not measured by days, months, or years… They are measured by the happiness they bring, the memories they create, and the peace they leave in our hearts.
+
+This journey was never just about celebrating one year. It was about celebrating every smile, every laugh, and every moment that made our brotherhood stronger.
+
+Thank you, Muzammil, for being one of the most precious parts of my life. ❤️`;
+
+function startFinalEndingSequence(){
+    if(finalStarted)return;finalStarted=true;
+    const elem=document.getElementById("final-cinematic-text"),sig=document.getElementById("final-signature"),wait=document.getElementById("wait-last-thing");
+    elem.innerHTML="";sig.classList.add("hidden");wait.classList.add("hidden");
+    let i=0;
+    function type(){
+        if(i<finalMsgText.length){
+            elem.innerHTML+=finalMsgText[i]==="\n"?"<br>":finalMsgText[i++];
+            setTimeout(type,32);
+        }else{
+            setTimeout(()=>fadeToEndCard(),2200);
         }
+    }
+    function fadeToEndCard(){
+        elem.style.transition="opacity 1s";elem.style.opacity="0";
+        setTimeout(()=>{
+            elem.innerHTML="";
+            elem.style.opacity="1";
+            sig.innerHTML=`<div class="glass-card text-center">
+                <p>Thank you for being one of the most valuable parts of my life.<br>This journey became beautiful because you were a part of it.</p>
+                <h3 style="color:var(--gold-primary);margin:15px 0 5px">Mohsin Tariq ❤️ Muzammil Tanoli</h3>
+                <p style="font-size:.8rem;color:var(--gold-primary)">One Heart • One Brotherhood • Countless Memories</p>
+            </div>`;
+            sig.classList.remove("hidden");
+            setTimeout(()=>fadeSignatureToTheEnd(),5200);
+        },1000);
+    }
+    function fadeSignatureToTheEnd(){
+        sig.style.transition="opacity 1s";sig.style.opacity="0";
+        setTimeout(()=>{
+            sig.classList.add("hidden");
+            sig.innerHTML=`<h1 class="the-end-title">THE END</h1>`;
+            sig.classList.remove("hidden");sig.style.opacity="1";
+            setTimeout(()=>beginWaitSequence(),3000);
+        },1000);
+    }
+    function beginWaitSequence(){
+        const card=document.getElementById("ending-card");
+        card.style.transition="opacity 1s";card.style.opacity="0";
+        setTimeout(()=>{
+            card.style.opacity="1";
+            card.innerHTML=`<div id="wait-last-thing" class="wait-last-thing">
+                <div class="wait-small">Wait…</div>
+                <div id="one-last" class="wait-big hidden">One last thing.</div>
+                <div id="last-message" class="hidden">
+                    <div class="wait-message">This wasn't the end of our story.<br>It was only another beautiful chapter.</div>
+                    <div class="wait-name">Mohsin ❤️ Muzammil</div>
+                </div>
+            </div>`;
+            const box=document.getElementById("wait-last-thing");
+            setTimeout(()=>document.getElementById("one-last").classList.remove("hidden"),2200);
+            setTimeout(()=>document.getElementById("last-message").classList.remove("hidden"),4700);
+            setTimeout(()=>{
+                card.style.transition="opacity 3s";
+                card.style.opacity="0";
+                document.body.style.transition="opacity 3s";
+                document.body.style.opacity="0";
+            },9500);
+        },1200);
     }
     type();
 }
 
-// ==========================================
-// 16. SCENE 14B: SILENT REFLECTION
-// ==========================================
-function startSilentReflection() {
-    setTimeout(() => {
-        nextScene();
-    }, 6000);
+// Restart support
+function restartJourney(){
+    location.reload();
 }
 
-// ==========================================
-// 17. SCENE 15: OPEN GIFT BOX
-// ==========================================
-function openGiftBox() {
-    const box = document.getElementById('gift-box');
-    if (box) box.style.transform = 'scale(1.3) rotate(10deg)';
-    setTimeout(nextScene, 1000);
-}
-
-// ==========================================
-// 18. MILKY WAY & TWINKLING GALAXY BG
-// ==========================================
-function startGalaxyBackground(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const stars = [];
-    const numStars = 180;
-    for (let i = 0; i < numStars; i++) {
-        stars.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            radius: Math.random() * 1.5 + 0.5,
-            alpha: Math.random(),
-            speed: Math.random() * 0.02 + 0.005
+// Easter egg counter — fixed valid JavaScript comment
+let easterClickCount=0;
+document.addEventListener("DOMContentLoaded",()=>{
+    const trigger=document.getElementById("secret-easter-trigger");
+    if(trigger){
+        trigger.addEventListener("click",e=>{
+            e.stopPropagation();easterClickCount++;
+            if(easterClickCount>=5){triggerEasterEggPopup();easterClickCount=0}
         });
     }
-
-    function renderGalaxy() {
-        ctx.fillStyle = 'rgba(5, 5, 12, 0.3)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        stars.forEach(star => {
-            star.alpha += star.speed;
-            if (star.alpha > 1 || star.alpha < 0) star.speed = -star.speed;
-
-            ctx.beginPath();
-            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = '#ffd700';
-            ctx.fill();
-        });
-
-        galaxyAnimationId = requestAnimationFrame(renderGalaxy);
-    }
-    renderGalaxy();
-}
-
-// ==========================================
-// 19. HIGH-QUALITY 7-COLOR FIREWORKS
-// ==========================================
-function triggerFireworks() {
-    const canvas = document.getElementById('fireworks-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const colors = [
-        '#ff0055', '#ffd700', '#00e5ff', '#ff9900', '#b026ff', '#00ff66', '#ffffff'
-    ];
-
-    let particles = [];
-
-    class Particle {
-        constructor(x, y, color) {
-            this.x = x;
-            this.y = y;
-            this.color = color;
-            const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 6 + 2;
-            this.vx = Math.cos(angle) * speed;
-            this.vy = Math.sin(angle) * speed;
-            this.alpha = 1;
-            this.decay = Math.random() * 0.015 + 0.008;
-        }
-
-        draw() {
-            ctx.save();
-            ctx.globalAlpha = this.alpha;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = this.color;
-            ctx.fill();
-            ctx.restore();
-        }
-
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            this.vy += 0.05;
-            this.alpha -= this.decay;
-        }
-    }
-
-    function createExplosion() {
-        const x = Math.random() * canvas.width * 0.8 + canvas.width * 0.1;
-        const y = Math.random() * canvas.height * 0.5 + canvas.height * 0.1;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        for (let i = 0; i < 50; i++) {
-            particles.push(new Particle(x, y, color));
-        }
-    }
-
-    let frameCount = 0;
-    function loop() {
-        ctx.fillStyle = 'rgba(5, 5, 8, 0.2)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        if (frameCount % 20 === 0) {
-            createExplosion();
-        }
-
-        particles.forEach((p, index) => {
-            if (p.alpha <= 0) {
-                particles.splice(index, 1);
-            } else {
-                p.update();
-                p.draw();
-            }
-        });
-
-        frameCount++;
-        fireworksAnimationId = requestAnimationFrame(loop);
-    }
-
-    loop();
-}
-// ==========================================
-// 20. CINEMATIC FINAL SCENE SEQUENCE
-// ==========================================
-const finalMsgText = "Some friendships are not measured by days, months, or years… They are measured by the happiness they bring, the memories they create, and the peace they leave in our hearts.\n\nThis journey was never just about celebrating one year. It was about celebrating every smile, every laugh, and every moment that made our brotherhood stronger.\n\nThank you, Muzammil, for being one of the most precious parts of my life. ❤️";
-
-function startFinalEndingSequence() {
-    if (galaxyAnimationId) { 
-        cancelAnimationFrame(galaxyAnimationId); 
-        galaxyAnimationId = null; 
-    }
-
-    const elem = document.getElementById('final-cinematic-text');
-    const sig = document.getElementById('final-signature');
-
-    if (!elem) return;
-    if (sig) sig.classList.add('hidden');
-    
-    elem.innerHTML = '';
-    elem.style.display = "block";
-    elem.style.opacity = "1";
-    let i = 0;
-
-    function typeFinal() {
-        if (i < finalMsgText.length) {
-            elem.innerHTML += finalMsgText.charAt(i) === '\n' ? '<br>' : finalMsgText.charAt(i);
-            i++;
-            setTimeout(typeFinal, 35);
-        } else {
-            setTimeout(() => {
-                elem.style.transition = "opacity 0.8s ease";
-                elem.style.opacity = "0";
-
-                setTimeout(() => {
-                    elem.style.display = "none";
-                    
-                    if (sig) {
-                        sig.innerHTML = `
-                            <div class="glass-card text-center" style="border-color: var(--border-gold);">
-                                <p style="font-size: 0.95rem; color: #ffffff; line-height: 1.6;">
-                                    Thank you for being one of the most valuable parts of my life.<br>
-                                    This journey became beautiful because you were a part of it.
-                                </p>
-                                <h3 style="color: var(--gold-primary); font-size: 1.3rem; margin: 15px 0 5px 0;">
-                                    Mohsin Tariq ❤️ Muzammil Tanoli
-                                </h3>
-                                <p style="font-size: 0.8rem; color: var(--gold-primary); letter-spacing: 1px;">
-                                    One Heart • One Brotherhood • Countless Memories
-                                </p>
-                            </div>
-                        `;
-                        sig.style.opacity = "0";
-                        sig.classList.remove('hidden');
-                        
-                        setTimeout(() => {
-                            sig.style.transition = "opacity 1.2s ease";
-                            sig.style.opacity = "1";
-
-                            setTimeout(() => {
-                                sig.style.transition = "opacity 1s ease";
-                                sig.style.opacity = "0";
-
-                                setTimeout(() => {
-                                    sig.innerHTML = `
-                                        <h1 class="the-end-title text-center" style="font-size: 2.8rem; color: var(--gold-primary); letter-spacing: 5px; text-shadow: 0 0 20px var(--gold-glow);">
-                                            THE END
-                                        </h1>
-                                    `;
-                                    sig.style.opacity = "1";
-
-                                    setTimeout(() => {
-                                        const appContainer = document.body;
-                                        appContainer.style.transition = "opacity 3.5s ease";
-                                        appContainer.style.opacity = "0";
-                                    }, 3500);
-
-                                }, 1000);
-                            }, 5000);
-                        }, 100);
-                    }
-                }, 1000);
-            }, 2000);
-        }
-    }
-
-    typeFinal();
-}
-
-function restartJourney() {
-    currentScene = 1;
-    currentQuestionIdx = 0;
-    document.body.style.transition = "opacity 0.5s ease";
-    document.body.style.opacity = "1";
-    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
-    const s1 = document.getElementById('scene-1');
-    if (s1) s1.classList.add('active');
-    startScene1Animation();
-}
-
-// ==========================================
-// 21. EASTER EGG POPUP LOGIC
-// ==========================================
-let easterClickCount = 0;
-document.addEventListener('DOMContentLoaded', () => {
-    const trigger = document.getElementById('secret-easter-trigger');
-    if (trigger) {
-        trigger.addEventListener('click', () => {
-            easterClickCount++;
-            if (easterClickCount >= 5) {
-                triggerEasterEggPopup();
-                easterClickCount = 0;
-            }
-        });
-    }
+    // Make bouquet card itself advance, except name
+    const card=document.querySelector("#scene-2 .bouquet-card");
+    if(card)card.addEventListener("click",e=>{if(e.target.id!=="secret-easter-trigger")nextScene()});
 });
-
-function closeEasterModal() {
-    const modal = document.getElementById('easter-modal');
-    if (modal) modal.classList.add('hidden');
-}
-
-// ==========================================
-// 22. SCENE 18: WISHES WALL FIREWORKS
-// ==========================================
-function startWishesFireworks() {
-    const canvas = document.getElementById('wishes-fireworks-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    let particles = [];
-    const colors = ['#ffd700', '#ff0055', '#00e5ff', '#ffaa00', '#ffffff', '#00ff66'];
-
-    function createExplosion() {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * (canvas.height * 0.5);
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        for (let i = 0; i < 30; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 4 + 1;
-            particles.push({
-                x: x,
-                y: y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                alpha: 1,
-                color: color
-            });
-        }
-    }
-
-    const fireInterval = setInterval(() => {
-        const scene18 = document.getElementById('scene-18');
-        if (scene18 && scene18.classList.contains('active')) {
-            createExplosion();
-        } else {
-            clearInterval(fireInterval);
-        }
-    }, 500);
-
-    function render() {
-        const scene18 = document.getElementById('scene-18');
-        if (!scene18 || !scene18.classList.contains('active')) return;
-
-        ctx.fillStyle = 'rgba(5, 5, 8, 0.2)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        particles.forEach((p, index) => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.alpha -= 0.015;
-
-            ctx.globalAlpha = p.alpha;
-            ctx.fillStyle = p.color;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            if (p.alpha <= 0) {
-                particles.splice(index, 1);
-            }
-        });
-
-        ctx.globalAlpha = 1;
-        requestAnimationFrame(render);
-    }
-
-    render();
-}

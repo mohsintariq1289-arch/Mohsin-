@@ -47,10 +47,11 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
+// ==========================================
+// MUSIC CONTROL
+// ==========================================
+let isMusicPlaying = false;
 
-// ==========================================
-// 2. MUSIC
-// ==========================================
 function toggleMusic() {
     const music = document.getElementById("bg-music");
     const button = document.getElementById("music-toggle-btn");
@@ -74,10 +75,11 @@ function toggleMusic() {
                 }
             })
             .catch(error => {
-                console.log("Music play blocked:", error);
+                console.log("Music play blocked or failed:", error);
             });
     }
 }
+
 
 
 // ==========================================
@@ -584,133 +586,6 @@ function flipGalleryCard(element) {
     if (!element) return;
     element.classList.toggle("flipped");
 }
-
-// ==========================================
-// 15B. MEMORY MATCH GAME LOGIC
-// ==========================================
-
-const memoryIcons = ["🎈", "⭐", "🎵", "💖", "🌸", "🔥", "👑", "💎"];
-let gameCards = [];
-let flippedCards = [];
-let matchedPairs = 0;
-let gameMoves = 0;
-let canFlipCard = true;
-
-function startMemoryMatchGame() {
-    // Go to Game Board Scene
-    goToScene("scene-12-game-board");
-
-    // Reset Game Stats
-    gameMoves = 0;
-    matchedPairs = 0;
-    flippedCards = [];
-    canFlipCard = true;
-    
-    const movesEl = document.getElementById("game-moves-count");
-    const matchesEl = document.getElementById("game-matches-count");
-    if (movesEl) movesEl.innerText = "0";
-    if (matchesEl) matchesEl.innerText = "0";
-    
-    const resultBox = document.getElementById("game-result-box");
-    if (resultBox) resultBox.classList.add("hidden");
-
-    // Prepare Cards Grid
-    gameCards = [...memoryIcons, ...memoryIcons].sort(() => Math.random() - 0.5);
-
-    const gridContainer = document.getElementById("memory-grid-container");
-    if (!gridContainer) return;
-
-    gridContainer.style.display = "grid";
-    gridContainer.innerHTML = "";
-
-    gameCards.forEach((icon, index) => {
-        const card = document.createElement("div");
-        card.classList.add("mem-card");
-        card.dataset.icon = icon;
-
-        card.innerHTML = `
-            <div class="mem-card-inner">
-                <div class="mem-card-front">✦</div>
-                <div class="mem-card-back">${icon}</div>
-            </div>
-        `;
-
-        card.addEventListener("click", () => handleGameCardClick(card));
-        gridContainer.appendChild(card);
-    });
-}
-
-function handleGameCardClick(card) {
-    if (!canFlipCard || card.classList.contains("flipped") || card.classList.contains("matched")) return;
-
-    card.classList.add("flipped");
-    flippedCards.push(card);
-
-    if (flippedCards.length === 2) {
-        gameMoves++;
-        const movesEl = document.getElementById("game-moves-count");
-        if (movesEl) movesEl.innerText = gameMoves;
-        checkMemoryMatch();
-    }
-}
-
-function checkMemoryMatch() {
-    canFlipCard = false;
-    const [card1, card2] = flippedCards;
-
-    if (card1.dataset.icon === card2.dataset.icon) {
-        card1.classList.add("matched");
-        card2.classList.add("matched");
-        matchedPairs++;
-        
-        const matchesEl = document.getElementById("game-matches-count");
-        if (matchesEl) matchesEl.innerText = matchedPairs;
-
-        flippedCards = [];
-        canFlipCard = true;
-
-        if (matchedPairs === 8) {
-            setTimeout(showGameResultScreen, 500);
-        }
-    } else {
-        setTimeout(() => {
-            card1.classList.remove("flipped");
-            card2.classList.remove("flipped");
-            flippedCards = [];
-            canFlipCard = true;
-        }, 800);
-    }
-}
-
-function showGameResultScreen() {
-    const gridContainer = document.getElementById("memory-grid-container");
-    if (gridContainer) gridContainer.style.display = "none";
-
-    const scoreEl = document.getElementById("final-moves-score");
-    if (scoreEl) scoreEl.innerText = gameMoves;
-
-    const resultBox = document.getElementById("game-result-box");
-    if (resultBox) resultBox.classList.remove("hidden");
-
-    // Full Screen Fireworks trigger ONLY when Result Screen appears
-    if (typeof confetti === "function") {
-        // Left side blast
-        confetti({
-            particleCount: 80,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0, y: 0.7 }
-        });
-        // Right side blast
-        confetti({
-            particleCount: 80,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1, y: 0.7 }
-        });
-    }
-}
-
 
 
 // ==========================================

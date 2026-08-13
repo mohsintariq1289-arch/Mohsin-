@@ -13,26 +13,27 @@
 
 <body>
 
-    <!-- =====================================================
-         TOP CONTROLS
-    ====================================================== -->
-    <div class="top-widget">
-        <div class="clock-display" id="clock">
-            Loading...
-        </div>
-
-        <button
-            class="music-btn"
-            id="music-toggle-btn"
-            onclick="toggleMusic()">
-            🎵 Play Music
-        </button>
+    
+<!-- =====================================================
+     TOP CONTROLS & BACKGROUND MUSIC
+====================================================== -->
+<div class="top-widget">
+    <div class="clock-display" id="clock">
+        Loading...
     </div>
 
-    <!-- BACKGROUND MUSIC -->
-    <audio id="bg-music" loop preload="auto">
-        <source src="music.mp3" type="audio/mpeg">
-    </audio>
+    <button
+        class="music-btn"
+        id="music-toggle-btn"
+        onclick="toggleMusic()">
+        🎵 Play Music
+    </button>
+</div>
+
+<!-- BACKGROUND MUSIC (Dropbox Direct Raw Stream) -->
+<audio id="bg-music" loop preload="none">
+    <source src="https://www.dropbox.com/scl/fi/7qf46yjgtyxnxfxqxbnmg/Yaariyaan_Ehd-E-Wafa_OST_Full_Song__Lyrics__I_Loo_Gee_Music-128k.mp3?rlkey=heoeh1ob35at0suy39zhzkb9f&st=hsd428i6&raw=1" type="audio/mpeg">
+</audio>
 
 
     <!-- =====================================================
@@ -772,196 +773,86 @@
             </div>
 
         </div>
-  
-        <!-- =================================================
-             SCENE 12 — MEMORY GALLERY
-        ================================================== -->
-        <div class="scene" id="scene-12">
+<!-- =================================================
+     SCENE 12 — MEMORY GALLERY
+================================================== -->
+<div class="scene" id="scene-12">
 
-            <div class="glass-card text-center scrollable-card">
+    <div class="glass-card text-center scrollable-card">
 
-                <h2>
-                    📸 Our 3D Memory Gallery
-                </h2>
+        <h2>
+            📸 Our 3D Memory Gallery
+        </h2>
 
-                <p class="hint">
-                    Tap each 3D card to flip & reveal hidden memories ✨
-                </p>
+        <p class="hint">
+            Tap each 3D card to flip & reveal hidden memories ✨
+        </p>
 
-                <div class="gallery-grid mt-15">
+        <div class="gallery-grid mt-15">
 
-                    <div
-                        class="gallery-item flip-card"
-                        onclick="flipGalleryCard(this)">
-
-                        <div class="flip-inner">
-
-                            <div class="g-front flip-front">
-                                <img
-                                    src="pic1.jpg"
-                                    alt="Memory 1">
-                            </div>
-
-                            <div class="g-back flip-back">
-                                Every picture freezes a moment...
-                                but every memory keeps it alive forever.
-                            </div>
-
-                        </div>
-
+            <!-- Card 1 -->
+            <div class="gallery-item flip-card" onclick="flipGalleryCard(this)">
+                <div class="flip-inner">
+                    <div class="g-front flip-front">
+                        <img src="https://i.ibb.co/jkxrmCq6/memory1.jpg" alt="Memory 1">
                     </div>
-
-
-                    <div
-                        class="gallery-item flip-card"
-                        onclick="flipGalleryCard(this)">
-
-                        <div class="flip-inner">
-
-                            <div class="g-front flip-front">
-                                <img
-                                    src="pic2.jpg"
-                                    alt="Memory 2">
-                            </div>
-
-                            <div class="g-back flip-back">
-                                Some smiles never fade,
-                                because they were shared
-                                with the right person.
-                            </div>
-
-                        </div>
-
+                    <div class="g-back flip-back">
+                        Every picture freezes a moment...
+                        but every memory keeps it alive forever.
                     </div>
-
-
-                    <div
-                        class="gallery-item flip-card"
-                        onclick="flipGalleryCard(this)">
-
-                        <div class="flip-inner">
-
-                            <div class="g-front flip-front">
-                                <img
-                                    src="pic3.jpg"
-                                    alt="Memory 3">
-                            </div>
-
-                            <div class="g-back flip-back">
-                                One photo...
-                                countless emotions.
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="gallery-item flip-card"
-                        onclick="flipGalleryCard(this)">
-
-                        <div class="flip-inner">
-
-                            <div class="g-front flip-front">
-                                <img
-                                    src="pic4.jpg"
-                                    alt="Memory 4">
-                            </div>
-
-                            <div class="g-back flip-back">
-                                The best memories are never planned.
-                                They simply happen.
-                            </div>
-
-                        </div>
-
-                    </div>
-
                 </div>
+            </div>
 
-                <!-- NEXT BUTTON NOW GOES TO GAME INTRO -->
-                <button
-                    class="btn-glow mt-15"
-                    onclick="goToScene('scene-12-game-intro')">
+            <!-- Card 2 -->
+            <div class="gallery-item flip-card" onclick="flipGalleryCard(this)">
+                <div class="flip-inner">
+                    <div class="g-front flip-front">
+                        <img src="https://i.ibb.co/TBc533c5/memory-2.jpg" alt="Memory 2">
+                    </div>
+                    <div class="g-back flip-back">
+                        Some smiles never fade,
+                        because they were shared
+                        with the right person.
+                    </div>
+                </div>
+            </div>
 
-                    Play Memory Challenge 🎮
+            <!-- Card 3 -->
+            <div class="gallery-item flip-card" onclick="flipGalleryCard(this)">
+                <div class="flip-inner">
+                    <div class="g-front flip-front">
+                        <img src="https://i.ibb.co/zHXf7sQM/memory-3.jpg" alt="Memory 3">
+                    </div>
+                    <div class="g-back flip-back">
+                        One photo...
+                        countless emotions.
+                    </div>
+                </div>
+            </div>
 
-                </button>
-
+            <!-- Card 4 -->
+            <div class="gallery-item flip-card" onclick="flipGalleryCard(this)">
+                <div class="flip-inner">
+                    <div class="g-front flip-front">
+                        <img src="https://i.ibb.co/BvDMWLy/file-000000003db08208abdfc93a3c903077-1.jpg" alt="Memory 4">
+                    </div>
+                    <div class="g-back flip-back">
+                        The best memories are never planned.
+                        They simply happen.
+                    </div>
+                </div>
             </div>
 
         </div>
 
+        <button class="btn-glow mt-15" onclick="nextScene()">
+            Special Video 🎥
+        </button>
 
-        <!-- =================================================
-             SCENE 12-GAME-INTRO — MEMORY MATCH CHALLENGE INTRO
-        ================================================== -->
-        <div class="scene" id="scene-12-game-intro">
+    </div>
 
-            <div class="glass-card text-center">
+</div>
 
-                <h2>Friendship <span style="color:#ff416c">Memory Challenge</span></h2>
-                <p class="hint">Flip the cards. Match the memories. Prove your bond. ✨</p>
-
-                <div class="challenge-info-list mt-15">
-                    <div class="info-box">
-                        <span>✨</span> 8 pairs of glowing memory cards
-                    </div>
-                    <div class="info-box">
-                        <span>⏱️</span> Track every move you make
-                    </div>
-                    <div class="info-box">
-                        <span>🎉</span> Confetti celebration on completion
-                    </div>
-                    <div class="info-box">
-                        <span>🏆</span> Unlock your Best Friend score
-                    </div>
-                </div>
-
-                <button class="btn-glow mt-15" onclick="startMemoryMatchGame()">
-                    Start Challenge 🚀
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             SCENE 12-GAME-BOARD — MEMORY MATCH GAME BOARD
-        ================================================== -->
-        <div class="scene" id="scene-12-game-board">
-
-            <div class="glass-card text-center">
-
-                <h2>Memory <span style="color:#00f2fe">Match</span></h2>
-
-                <!-- Status Bar: Moves & Matches -->
-                <div class="game-status-bar">
-                    <div class="status-item">Moves: <span id="game-moves-count">0</span></div>
-                    <div class="status-item">Matches: <span id="game-matches-count">0</span>/8</div>
-                </div>
-
-                <!-- 4x4 Cards Grid -->
-                <div class="memory-grid" id="memory-grid-container">
-                    <!-- Cards dynamically injected by JS -->
-                </div>
-
-                <!-- Result Overlay Inside Game Card -->
-                <div id="game-result-box" class="game-result-box hidden">
-                    <div class="trophy-icon">🏆</div>
-                    <h3>Amazing <span style="color:#ffd700">Best Friend!</span></h3>
-                    <p class="final-score-text">Final Score: <span id="final-moves-score">0</span> Moves</p>
-                    <p class="hint">You matched every memory beautifully! ❤️</p>
-                    <button class="btn-glow mt-15" onclick="goToScene('scene-12b')">
-                        Special Video 🎥
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
 
 
         <!-- =================================================
@@ -1600,8 +1491,7 @@
     <!-- =====================================================
          SCRIPT
     ====================================================== -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
 </html>

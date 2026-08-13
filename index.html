@@ -15,25 +15,25 @@
 
     
 <!-- =====================================================
-     TOP CONTROLS & BACKGROUND MUSIC
-====================================================== -->
-<div class="top-widget">
-    <div class="clock-display" id="clock">
-        Loading...
+         TOP CONTROLS
+    ====================================================== -->
+    <div class="top-widget">
+        <div class="clock-display" id="clock">
+            Loading...
+        </div>
+
+        <button
+            class="music-btn"
+            id="music-toggle-btn"
+            onclick="toggleMusic()">
+            🎵 Play Music
+        </button>
     </div>
 
-    <button
-        class="music-btn"
-        id="music-toggle-btn"
-        onclick="toggleMusic()">
-        🎵 Play Music
-    </button>
-</div>
-
-<!-- BACKGROUND MUSIC (Dropbox Direct Raw Stream) -->
-<audio id="bg-music" loop preload="none">
-    <source src="https://www.dropbox.com/scl/fi/7qf46yjgtyxnxfxqxbnmg/Yaariyaan_Ehd-E-Wafa_OST_Full_Song__Lyrics__I_Loo_Gee_Music-128k.mp3?rlkey=heoeh1ob35at0suy39zhzkb9f&st=hsd428i6&raw=1" type="audio/mpeg">
-</audio>
+    <!-- BACKGROUND MUSIC -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
 
 
     <!-- =====================================================

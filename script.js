@@ -48,10 +48,8 @@ setInterval(updateClock, 1000);
 updateClock();
 
 // ==========================================
-// MUSIC CONTROL
+// 2. MUSIC
 // ==========================================
-let isMusicPlaying = false;
-
 function toggleMusic() {
     const music = document.getElementById("bg-music");
     const button = document.getElementById("music-toggle-btn");
@@ -75,11 +73,10 @@ function toggleMusic() {
                 }
             })
             .catch(error => {
-                console.log("Music play blocked or failed:", error);
+                console.log("Music play blocked:", error);
             });
     }
 }
-
 
 
 // ==========================================

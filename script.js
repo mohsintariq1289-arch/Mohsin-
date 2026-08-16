@@ -123,14 +123,14 @@ function nextScene() {
     }
     else if (currentScene === "7b") {
         currentScene = 8;
-    }
+      }
     else if (currentScene === 10) {
         currentScene = "10b";
     }
     else if (currentScene === "10b") {
         currentScene = 11;
     }
-    else if (currentScene === 12) {
+     else if (currentScene === 12) {
         currentScene = "12b";
     }
     else if (currentScene === "12b") {
@@ -800,95 +800,93 @@ function triggerScene13Fireworks() {
             }
         });
 
-        requestAnimationFrame(renderFireworks);
+        if (document.getElementById("scene-13")?.classList.contains("active")) {
+            requestAnimationFrame(renderFireworks);
+        }
     }
 
     renderFireworks();
 }
 
-function start365DaysStory() {
-    // Start fireworks background
+// Helper function to animate a single counter sequentially
+function animateSingleCounter(elementId, start, end, duration, isLast = false) {
+    return new Promise((resolve) => {
+        const el = document.getElementById(elementId);
+        if (!el) {
+            resolve();
+            return;
+        }
+
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const current = Math.floor(progress * (end - start) + start);
+            
+            // Format numbers with commas (e.g., 8,760)
+            el.innerText = current.toLocaleString() + (isLast && progress === 1 ? '+' : '');
+            
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                resolve(); // Resolves promise when counter animation finishes
+            }
+        };
+        window.requestAnimationFrame(step);
+    });
+}
+
+// Main function to run the sequential animation with fireworks
+async function start365DaysStory() {
+    // Start background fireworks animation
     triggerScene13Fireworks();
 
-    const daysEl = document.getElementById("count-days");
-    const hoursEl = document.getElementById("count-hours");
-    const minutesEl = document.getElementById("count-minutes");
-    const secondsEl = document.getElementById("count-seconds");
-    const messageEl = document.getElementById("days-story-message");
-    const heartEl = document.getElementById("days-final-symbol");
+    // Reset all counter values to 0 initially
+    document.getElementById("count-days").innerText = "0";
+    document.getElementById("count-hours").innerText = "0";
+    document.getElementById("count-minutes").innerText = "0";
+    document.getElementById("count-seconds").innerText = "0";
 
-    if (!daysEl) return;
+    // Step 1: Animate Days Counter
+    await animateSingleCounter("count-days", 0, 365, 1000);
 
-    // Animation values
-    let days = 0;
-    let hours = 0;
-    let minutes = 0;
-    let seconds = 0;
+    // Step 2: Animate Hours Counter
+    await animateSingleCounter("count-hours", 0, 8760, 1200);
 
-    const targetDays = 365;
-    const targetHours = 24;
-    const targetMinutes = 60;
-    const targetSeconds = 60;
+    // Step 3: Animate Minutes Counter
+    await animateSingleCounter("count-minutes", 0, 525600, 1500);
 
-    const interval = setInterval(() => {
-        if (days < targetDays) {
-            days += 5;
-            if (days > targetDays) days = targetDays;
-            daysEl.innerText = days;
-        }
+    // Step 4: Animate Seconds Counter
+    await animateSingleCounter("count-seconds", 0, 31536000, 1800, true);
 
-        if (hours < targetHours) {
-            hours += 1;
-            if (hours > targetHours) hours = targetHours;
-            hoursEl.innerText = hours;
-        }
+    // Step 5: Reveal Story Message
+    const message = document.getElementById("days-story-message");
+    if (message) {
+        message.classList.remove("hidden");
+        message.style.opacity = "0";
+        message.style.transition = "opacity 1s ease";
+        setTimeout(() => { message.style.opacity = "1"; }, 50);
+    }
 
-        if (minutes < targetMinutes) {
-            minutes += 2;
-            if (minutes > targetMinutes) minutes = targetMinutes;
-            minutesEl.innerText = minutes;
-        }
-
-        if (seconds < targetSeconds) {
-            seconds += 3;
-            if (seconds > targetSeconds) seconds = targetSeconds;
-            secondsEl.innerText = seconds;
-        }
-
-        if (days >= targetDays && hours >= targetHours && minutes >= targetMinutes && seconds >= targetSeconds) {
-            clearInterval(interval);
-
-            setTimeout(() => {
-                if (messageEl) {
-                    messageEl.classList.remove("hidden");
-                    messageEl.style.opacity = "0";
-                    messageEl.style.transition = "opacity 1.2s ease";
-                    setTimeout(() => {
-                        messageEl.style.opacity = "1";
-                    }, 50);
-                }
-            }, 600);
-
-            setTimeout(() => {
-                if (heartEl) {
-                    heartEl.classList.remove("hidden");
-                    heartEl.style.opacity = "0";
-                    heartEl.style.transition = "opacity 1.2s ease";
-                    setTimeout(() => {
-                        heartEl.style.opacity = "1";
-                    }, 50);
-                }
-            }, 1800);
-        }
-    }, 40);
+    // Step 6: Reveal Final Heart Symbol (M ❤️ M)
+    const symbol = document.getElementById("days-final-symbol");
+    if (symbol) {
+        setTimeout(() => {
+            symbol.classList.remove("hidden");
+            symbol.style.opacity = "0";
+            symbol.style.transition = "opacity 1s ease";
+            setTimeout(() => { symbol.style.opacity = "1"; }, 50);
+        }, 500);
+    }
 }
+
 
 
 // ======================================================
 // 17. MEMORY GALAXY (SCENE 13.5)
 // ======================================================
 const galaxyMemories = [
-    "🌱 September 2025: The day our journey began.",
+    "🌟 September 2025: The day our journey began.",
     "✨ Late Night Chats & Endless Laughs.",
     "🚀 Supporting each other's dreams every step of the way.",
     "🤝 Unbreakable Trust & Honesty.",
